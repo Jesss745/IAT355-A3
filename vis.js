@@ -6,6 +6,8 @@ async function render() {
   const Nintendo = videoGameData.filter((item) => { return item.Publisher === "Nintendo" });
   const Nintendo2 = videoGameData2.filter((item) => { return item.publisher === "Nintendo" });
   const bestSeller = Nintendo.filter((item) => { return item.Global_Sales >= 10 });
+  const nonNA = videoGameData.filter((item) => { return item.Year != "N/A" });
+  const nintendoNonNA = Nintendo.filter((item) => { return item.Year != "N/A" });
 
   // Visualization 1 - Genre
   const vlSpec = vl
@@ -13,8 +15,9 @@ async function render() {
     .data(videoGameData)
     .title('Units Sold Globally Based on Video Game Genres')
     .encode(
-      vl.y().fieldQ('Global_Sales').aggregate('sum').title('Unit Sold by Million'),
-      vl.x().fieldN('Genre').sort('-y')
+      vl.x().fieldQ('Global_Sales').aggregate('sum').title('Unit Sold by Million'),
+      vl.y().fieldN('Genre').sort('-x'),
+      vl.tooltip('Global_Sales').aggregate('sum').format('0.2f')
     )
     .width("container")
     .height(400)
@@ -31,8 +34,9 @@ async function render() {
     .data(videoGameData)
     .title('Units Sold Globally Based on Video Game Platforms')
     .encode(
-      vl.y().fieldQ('Global_Sales').aggregate('sum').title('Units Sold in Millions'),
-      vl.x().fieldN('Platform').sort('-y')
+      vl.x().fieldQ('Global_Sales').aggregate('sum').title('Units Sold in Millions'),
+      vl.y().fieldN('Platform').sort('-x'),
+      vl.tooltip('Global_Sales').aggregate('sum').format('0.2f')
     )
     .width("container")
     .height(400)
@@ -47,7 +51,7 @@ async function render() {
   const selection = vl.selectPoint()
   const v2Spec = vl
     .markLine()
-    .data(videoGameData)
+    .data(nonNA)
     .title('Sales Over Time by Video Game Genres')
     .params(selection)
     .encode(
@@ -70,7 +74,7 @@ async function render() {
   const selection2 = vl.selectPoint()
   const v2Spec2 = vl
     .markLine()
-    .data(videoGameData)
+    .data(nonNA)
     .title("Sales Over Time by Video Game Platform")
     .params(selection2)
     .encode(
@@ -96,7 +100,7 @@ async function render() {
     .encode(
       vl.y().fieldQ('sales_amount').title("Units Sold in Millions").aggregate('sum'),
       vl.x().fieldN('platform').title("Video Game Platform").sort('-y'),
-      vl.color().fieldN('platform').legend(null),
+      vl.color().fieldN('platform'),
       vl.tooltip(['platform']),
       vl.facet().fieldN("sales_region").columns(1).title("Sales of Video Game Platforms by Region")
     )
@@ -131,7 +135,7 @@ async function render() {
 
   const v4console = vl
     .markLine()
-    .data(Nintendo)
+    .data(nintendoNonNA)
     .title("Platforms Nintendo has Created Games for")
     .encode(
       vl.x().fieldN('Year').title("Year"),
@@ -153,12 +157,12 @@ async function render() {
     .title("Nintendo games that sold more than 10 million units")
     .encode(
       vl.x().fieldQ('Global_Sales').aggregate('sum').title('sales by million(s)'),
-      vl.y().fieldN('Name').title('Video Game Title').sort("x"),
+      vl.y().fieldN('Name').title('Video Game Title').sort("-x"),
       vl.color().fieldN('Genre'),
       vl.tooltip(['Year', 'Genre', 'Global_Sales'])
     )
     .width("container")
-    .height(400)
+    .height(500)
     .toSpec();
 
   vegaEmbed("#v4bestsells", v4bestsells).then((result) => {
