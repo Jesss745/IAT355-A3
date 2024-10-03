@@ -139,7 +139,7 @@ async function render() {
     .title("Platforms Nintendo has Created Games for")
     .encode(
       vl.x().fieldN('Year').title("Year"),
-      vl.y().fieldN('Platform').title("Consoles"),
+      vl.y().fieldN('Platform').title("Consoles").sort("x"),
       vl.color().fieldN('Platform')
     )
     .width("container")
@@ -176,7 +176,7 @@ async function render() {
     .title("Total Games in each Genre Nintendo has Released")
     .encode(
       vl.y().fieldQ('Global_Sales').aggregate('sum').title('sales by million(s)'),
-      vl.x().fieldN('Genre').title('Video game title').sort("-y"),
+      vl.x().fieldN('Genre').title('Video game genre').sort("-y"),
       vl.tooltip('Genre').aggregate('count'),
       vl.color('Genre').aggregate('count')
    )
